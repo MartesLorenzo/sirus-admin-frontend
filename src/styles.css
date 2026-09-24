@@ -84,9 +84,10 @@ html {
   line-height: 1;
 }
 .logo-cloud {
-  color: #390f97;
-  font-size: 30px;
-  line-height: 0.8;
+  width: 33px;
+  height: 33px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 .logo em {
   font-style: normal;

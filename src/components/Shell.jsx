@@ -56,7 +56,7 @@ export default function Shell() {
       <aside className={`sidebar ${open ? "open" : ""}`}>
         <div className="sidebar-top">
           <NavLink to="/" className="logo" onClick={() => setOpen(false)}>
-            <span className="logo-cloud">☁</span>
+            <img className="logo-cloud" src="/sirus-emblem.png" alt="" />
             <span>
               SIRUS <em>CLOUD</em>
               <small>ADMIN SPACE</small>
