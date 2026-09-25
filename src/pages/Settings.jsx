@@ -100,6 +100,8 @@ export default function Settings() {
                 onChange={change("generalEmail")}
               />
             </Field>
+            <Field label="Email de projetos"><input type="email" value={form.projectEmail || "projetos@sirus.cloud"} onChange={change("projectEmail")} /></Field>
+            <Field label="Email de suporte"><input type="email" value={form.supportEmail || "suporte@sirus.cloud"} onChange={change("supportEmail")} /></Field>
             <Field label="Morada">
               <input value={form.location} onChange={change("location")} />
             </Field>
@@ -137,9 +139,7 @@ export default function Settings() {
           <div className="note-box">
             <ShieldCheck size={20} />
             <span>
-              Estas edições ainda são locais ao navegador. Publicar no website,
-              proteger o acesso e sincronizar dados exige backend, autenticação
-              e API.
+              Os contactos guardados são publicados no website através da API.
             </span>
           </div>
           <a

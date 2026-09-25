@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { ArrowUpRight, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { useAdmin } from "../App";
@@ -34,6 +35,7 @@ const blank = {
   deadline: "",
   progress: 0,
   budget: "",
+  amountPaid: "",
 };
 
 export default function Clients() {
@@ -72,6 +74,7 @@ export default function Clients() {
       progress: Math.min(100, Math.max(0, Number(form.progress) || 0)),
       budget: Number(form.budget) || 0,
     };
+    if (Number(item.amountPaid || 0) > Number(item.budget || 0)) return window.alert("O pagamento não pode superar o orçamento.");
     if (item.deadline && item.startDate && item.deadline < item.startDate)
       return window.alert("O prazo deve ser posterior à data de início.");
     setClients(
@@ -193,6 +196,7 @@ export default function Clients() {
                     >
                       Abrir →
                     </button>
+                    <Link className="table-action" to={`/clientes/${client.id}/acompanhamento`}> Tracking →</Link>
                   </td>
                 </tr>
               ))}
@@ -337,6 +341,7 @@ export default function Clients() {
                 />
               </Field>
             </div>
+            <Field label="Pagamento efetuado (Kz)"><input type="number" min="0" value={form.amountPaid || 0} onChange={(event) => setForm({ ...form, amountPaid: event.target.value })} /></Field>
             <Field label="Notas de acompanhamento">
               <textarea
                 rows="3"

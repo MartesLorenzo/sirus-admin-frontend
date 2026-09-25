@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAdmin } from "../App";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -47,6 +48,7 @@ const groups = [
 
 export default function Shell() {
   const [open, setOpen] = useState(false);
+  const { logout } = useAdmin();
   const location = useLocation();
   const current = groups
     .flatMap((group) => group.links)
@@ -103,7 +105,7 @@ export default function Shell() {
           <div className="sidebar-help">
             <CircleHelp size={19} />
             <b>Uma base para crescer.</b>
-            <p>Estrutura pronta para conectar à API e publicar o conteúdo.</p>
+            <p>Gerir reuniões, clientes, conteúdos e acompanhamento.</p>
           </div>
           <a
             className="sidebar-site"
@@ -139,7 +141,7 @@ export default function Shell() {
           </div>
           <div className="topbar-right">
             <span className="demo-indicator">
-              <span /> Modo demonstração
+              <span /> Ligado à API
             </span>
             <NavLink
               to="/reunioes"
@@ -149,6 +151,7 @@ export default function Shell() {
               <Bell size={19} />
               <i />
             </NavLink>
+            <button className="table-action" onClick={logout}>Sair</button>
             <div className="user-chip">
               <span>ML</span>
               <div>
@@ -163,7 +166,7 @@ export default function Shell() {
         </main>
         <footer className="footer">
           SIRUS CLOUD <span>·</span> Painel administrativo{" "}
-          <span className="footer-right">Versão inicial · frontend</span>
+          <span className="footer-right">Dados sincronizados com a API</span>
         </footer>
       </div>
     </div>

@@ -1796,3 +1796,18 @@ td code {
     display: none;
   }
 }
+.admin-auth { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #120a29; color: white; }
+.admin-auth form { display: grid; gap: 15px; width: min(420px, 100%); padding: 34px; background: #22163f; border: 1px solid #4a3770; border-radius: 18px; }
+.admin-auth form span { color: #b3a2f4; font-size: 12px; letter-spacing: .12em; font-weight: 800; }
+.admin-auth form h1 { font-size: 28px; margin: 0 0 7px; }
+.admin-auth label { display: grid; gap: 6px; font-size: 14px; }
+.admin-auth input { background: #fff; color: #211633; border-radius: 8px; padding: 12px; }
+.admin-auth button { padding: 13px; background: #6135fd; color: white; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.admin-auth button:disabled { opacity: .5; cursor: not-allowed; }
+.admin-auth p { color: #dac8f5; font-size: 13px; }
+.admin-sync-error { position: fixed; top: 12px; right: 12px; z-index: 999; padding: 15px; border-radius: 8px; background: #fff0ed; color: #922c18; box-shadow: 0 5px 22px #0003; }
+.tracking-admin-entry { padding: 15px 0; border-bottom: 1px solid #e5dbee; }
+.tracking-admin-entry small { color: #6944ad; }
+.tracking-admin-entry p { margin: 7px 0; }
+.tracking-admin-secret { margin: 16px 0; padding: 14px; background: #eadeff; color: #2e166a; border-radius: 8px; overflow-wrap: anywhere; }
+.tracking-admin-error { padding: 12px; color: #9c2d21; background: #fff0ed; }

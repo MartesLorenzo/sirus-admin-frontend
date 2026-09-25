@@ -38,6 +38,7 @@ const blank = {
   images: [],
   link: "",
   featured: false,
+  published: false,
 };
 
 export default function Portfolio() {
@@ -286,6 +287,7 @@ export default function Portfolio() {
                 placeholder="https://…"
               />
             </Field>
+            {category === "mobile" && <div className="form-grid"><Field label="Download Android"><input type="url" value={form.androidUrl || ""} onChange={(event) => setForm({ ...form, androidUrl: event.target.value })} /></Field><Field label="Download iOS"><input type="url" value={form.iosUrl || ""} onChange={(event) => setForm({ ...form, iosUrl: event.target.value })} /></Field></div>}
             <ImageFields
               images={form.images}
               onChange={(images) => setForm({ ...form, images })}
@@ -301,6 +303,7 @@ export default function Portfolio() {
               <Star size={16} /> Destacar na página inicial{" "}
               <small>Máximo de 3 por categoria</small>
             </label>
+            <label className="check-line"><input type="checkbox" checked={Boolean(form.published)} onChange={(event) => setForm({ ...form, published: event.target.checked })} /> Publicar no website</label>
             <FormActions onCancel={() => setEditing(null)} />
           </form>
         </Modal>
