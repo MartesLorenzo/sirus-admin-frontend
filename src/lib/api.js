@@ -11,6 +11,10 @@ export async function api(path, { method = "GET", body } = {}) {
   });
   if (response.status === 204) return null;
   const result = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(result.message || `Erro ${response.status}`);
+  if (!response.ok) {
+    const error = new Error(result.message || `Erro ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
   return result;
 }
