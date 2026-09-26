@@ -28,8 +28,13 @@ export default function Team() {
   const [password, setPassword] = useState({ currentPassword: "", newPassword: "" });
   const [message, setMessage] = useState("");
   async function reload() {
-    const [team, activity] = await Promise.all([api("/admin/users"), api(`/admin/users/activity/log${selectedUser ? `?actorId=${encodeURIComponent(selectedUser)}` : ""}`)]);
-    setUsers(team); setLogs(activity);
+    try {
+      const [team, activity] = await Promise.all([api("/admin/users"), api(`/admin/users/activity/log${selectedUser ? `?actorId=${encodeURIComponent(selectedUser)}` : ""}`)]);
+      setUsers(team); setLogs(activity);
+    } catch (cause) {
+      if (cause.status === 404) throw new Error("A API ligada ao painel está desatualizada: falta a rota de gestão da equipa. Atualiza e reinicia o Sirus-Backend antes de criar utilizadores.");
+      throw cause;
+    }
   }
   useEffect(() => { reload().catch((cause) => setError(cause.message)); }, [selectedUser]);
   function open(person) {
@@ -44,7 +49,7 @@ export default function Team() {
       if (result.password) setSecret(result.password);
       else setEditing(null);
       await reload();
-    } catch (cause) { setError(cause.message); } finally { setBusy(false); }
+    } catch (cause) { setError(cause.status === 404 ? "A API ligada ao painel está desatualizada. Atualiza e reinicia o Sirus-Backend para criar utilizadores." : cause.message); } finally { setBusy(false); }
   }
   async function remove(person) {
     if (!window.confirm(`Eliminar o acesso de ${person.name || person.email}?`)) return;
