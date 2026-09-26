@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CalendarDays, Clock3, Copy, Plus, Search, Trash2 } from "lucide-react";
 import { useAdmin } from "../App";
+import { useSystemDialog } from "../components/SystemDialog";
 import { api } from "../lib/api";
 import {
   Badge,
@@ -16,6 +17,7 @@ import { formatDate, id } from "../lib/storage";
 
 export default function Meetings() {
   const { bookings, setBookings, availability, setAvailability, refresh, can } = useAdmin();
+  const dialog = useSystemDialog();
   const [params] = useSearchParams();
   const [query, setQuery] = useState(params.get("codigo") || "");
   const [tab, setTab] = useState("pedidos");
@@ -35,7 +37,7 @@ export default function Meetings() {
     event.preventDefault();
     const slots = [...new Set(times)].sort();
     if (!slots.length || availability.some((item) => item.date === date))
-      return window.alert(
+      return dialog.notice(
         "Escolhe uma data nova e acrescenta pelo menos um horário.",
       );
     setAvailability(
@@ -136,7 +138,7 @@ export default function Meetings() {
                     </td>
                     <td>
                       <button className="table-action" onClick={() => setSelected(item)}>Ver briefing →</button>
-                      {can("meetings", "delete") && <button className="icon-button danger" type="button" aria-label={`Eliminar reunião ${item.code}`} onClick={async () => { if (!window.confirm(`Eliminar a reunião ${item.code}? O projeto associado ficará guardado.`)) return; try { await api(`/admin/meetings/${item.id}`, { method: "DELETE" }); await refresh(); } catch (error) { window.alert(error.message); } }}><Trash2 size={16}/></button>}
+                      {can("meetings", "delete") && <button className="icon-button danger" type="button" aria-label={`Eliminar reunião ${item.code}`} onClick={async () => { if (!await dialog.confirm(`Eliminar a reunião ${item.code}? O projeto associado ficará guardado.`)) return; try { await api(`/admin/meetings/${item.id}`, { method: "DELETE" }); await refresh(); } catch (error) { dialog.notice(error.message); } }}><Trash2 size={16}/></button>}
                     </td>
                   </tr>
                 ))}
@@ -192,8 +194,8 @@ export default function Meetings() {
                   </button>}
                   {can("meetings", "edit") && can("meetings", "delete") && <button
                     className="icon-button danger"
-                    onClick={() => {
-                      if (window.confirm("Remover esta data?"))
+                    onClick={async () => {
+                      if (await dialog.confirm("Remover esta data?"))
                         setAvailability(
                           availability.filter((item) => item.id !== day.id),
                         );
