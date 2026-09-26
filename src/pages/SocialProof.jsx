@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Building2, Image as ImageIcon, Plus, Star, Trash2, MessageSquareQuote } from "lucide-react";
 import { useAdmin } from "../App";
+import { useSystemDialog } from "../components/SystemDialog";
 import ImageFields from "../components/ImageFields";
 import { Badge, Empty, Field, Modal, PageIntro, Panel } from "../components/UI";
 import { id } from "../lib/storage";
@@ -10,6 +11,7 @@ const newTestimonial = { name: "", role: "", quote: "", images: [], featured: fa
 
 export default function SocialProof() {
   const { companies, setCompanies, testimonials, setTestimonials, can } = useAdmin();
+  const dialog = useSystemDialog();
   const [tab, setTab] = useState("testimonials");
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(null);
@@ -35,8 +37,8 @@ export default function SocialProof() {
     change(editing.id ? items.map((item) => item.id === editing.id ? saved : item) : [saved, ...items]);
     setEditing(null);
   }
-  function remove(item) {
-    if (window.confirm(`Eliminar ${isCompany ? "a empresa" : "o testemunho"} de ${item.name}?`))
+  async function remove(item) {
+    if (await dialog.confirm(`Eliminar ${isCompany ? "a empresa" : "o testemunho"} de ${item.name}?`))
       change(items.filter((entry) => entry.id !== item.id));
   }
   return <>
