@@ -19,7 +19,8 @@ export default function Meetings() {
   const [query, setQuery] = useState(params.get("codigo") || "");
   const [tab, setTab] = useState("pedidos");
   const [date, setDate] = useState("");
-  const [times, setTimes] = useState("09:00, 10:30, 15:00");
+  const [times, setTimes] = useState([]);
+  const [hour, setHour] = useState("09:00");
   const [selected, setSelected] = useState(null);
   const matches = bookings.filter((item) =>
     [item.code, item.name, item.company, item.projectName].some((text) =>
@@ -31,17 +32,10 @@ export default function Meetings() {
 
   function addDay(event) {
     event.preventDefault();
-    const slots = [
-      ...new Set(
-        times
-          .split(",")
-          .map((time) => time.trim())
-          .filter((time) => /^([01]\d|2[0-3]):[0-5]\d$/.test(time)),
-      ),
-    ].sort();
+    const slots = [...new Set(times)].sort();
     if (!slots.length || availability.some((item) => item.date === date))
       return window.alert(
-        "Escolhe uma data nova e horários válidos separados por vírgulas.",
+        "Escolhe uma data nova e acrescenta pelo menos um horário.",
       );
     setAvailability(
       [...availability, { id: id(), date, times: slots, enabled: true }].sort(
@@ -49,6 +43,7 @@ export default function Meetings() {
       ),
     );
     setDate("");
+    setTimes([]);
   }
   return (
     <>
@@ -167,16 +162,9 @@ export default function Meetings() {
                   onChange={(event) => setDate(event.target.value)}
                 />
               </Field>
-              <Field
-                label="Horários"
-                hint="Separa os horários por vírgulas. Ex.: 09:00, 10:30, 15:00"
-              >
-                <input
-                  value={times}
-                  onChange={(event) => setTimes(event.target.value)}
-                  required
-                />
-              </Field>
+              {date && <div className="booking-day-label"><Clock3 size={17} /><strong>{new Intl.DateTimeFormat("pt-PT", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T12:00:00Z`))}</strong></div>}
+              <Field label="Horários disponíveis"><div className="meeting-time-editor"><input type="time" value={hour} onChange={(event) => setHour(event.target.value)} /><button type="button" className="button subtle" aria-label="Acrescentar horário" onClick={() => hour && setTimes((current) => [...new Set([...current, hour])].sort())}><Plus size={17} /></button></div></Field>
+              <div className="meeting-time-chips">{times.map((slot) => <button key={slot} type="button" onClick={() => setTimes(times.filter((item) => item !== slot))} title="Remover horário">{slot} ×</button>)}</div>
               <button className="button primary" type="submit">
                 <Plus size={16} /> Adicionar disponibilidade
               </button>
@@ -228,9 +216,7 @@ export default function Meetings() {
       <div className="note-box">
         <Clock3 size={18} />
         <span>
-          Os dados e horários desta versão são demonstrativos. A confirmação, o
-          envio por WhatsApp e a ocupação automática de vagas dependem da
-          ligação ao backend.
+          A disponibilidade é guardada na API. Horários reservados deixam de aparecer para novos pedidos.
         </span>
       </div>
       {selected && (
@@ -255,6 +241,7 @@ export default function Meetings() {
             {[
               ["Cliente", selected.name],
               ["Empresa", selected.company],
+              ["Onde nos conheceu", selected.referral],
               ["Contacto", selected.phone],
               ["Email", selected.email],
               ["Serviço", selected.service],

@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Meetings from "./pages/Meetings";
 import Clients from "./pages/Clients";
 import ClientTracking from "./pages/ClientTracking";
+import Projects from "./pages/Projects";
 import Portfolio from "./pages/Portfolio";
 import News from "./pages/News";
 import Finance from "./pages/Finance";
@@ -14,15 +15,19 @@ import Settings from "./pages/Settings";
 const AdminContext = createContext(null);
 export const useAdmin = () => useContext(AdminContext);
 
-const initial = { bookings: [], availability: [], clients: [], portfolio: [], news: [], transactions: [], settings: {} };
-const resources = { clients: "clients", portfolio: "portfolio", news: "news", transactions: "transactions" };
+const initial = { bookings: [], availability: [], clients: [], projects: [], portfolio: [], news: [], transactions: [], settings: {} };
+const resources = { clients: "clients", projects: "projects", portfolio: "portfolio", news: "news", transactions: "transactions" };
 function payload(key, item) {
-  const { id, createdAt, updatedAt, trackingCode, accessPasswordHash, meetingId, ...fields } = item;
+  const { id, createdAt, updatedAt, trackingCode, accessPasswordHash, meetingId, passwordHash, objectives, client, code, progress, ...fields } = item;
   if (key === "clients") return {
     name: fields.name, contact: fields.contact || "", phone: fields.phone || "", email: fields.email || "",
-    status: fields.status, origin: fields.origin || "", bookingCode: fields.bookingCode || "", notes: fields.notes || "",
-    project: fields.project || "", startDate: fields.startDate || "", deadline: fields.deadline || "",
-    progress: Number(fields.progress) || 0, budget: Number(fields.budget) || 0, amountPaid: Number(fields.amountPaid) || 0,
+    status: fields.status, origin: fields.origin || "", company: fields.company || "", bookingCode: fields.bookingCode || "", notes: fields.notes || "",
+  };
+  if (key === "projects") return {
+    title: fields.title, description: fields.description || "", status: fields.status || "Em planeamento",
+    startDate: fields.startDate || "", deadline: fields.deadline || "",
+    budget: Number(fields.budget) || 0, amountPaid: Number(fields.amountPaid) || 0,
+    clientId: fields.clientId || null, links: fields.links || [],
   };
   if (key === "portfolio") return {
     category: fields.category, title: fields.title, slug: fields.slug, description: fields.description || "",
@@ -113,6 +118,8 @@ export default function App() {
             <Route path="reunioes" element={<Meetings />} />
             <Route path="clientes" element={<Clients />} />
             <Route path="clientes/:id/acompanhamento" element={<ClientTracking />} />
+            <Route path="projetos" element={<Projects />} />
+            <Route path="projetos/:id/acompanhamento" element={<ClientTracking />} />
             <Route path="portfolio/:category" element={<Portfolio />} />
             <Route path="noticias" element={<News />} />
             <Route path="gestao" element={<Finance />} />

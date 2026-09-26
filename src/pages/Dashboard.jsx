@@ -15,13 +15,13 @@ import { Badge, Empty, PageIntro, Panel } from "../components/UI";
 import { elapsedDays, formatDate, money } from "../lib/storage";
 
 export default function Dashboard() {
-  const { bookings, clients, portfolio, news } = useAdmin();
+  const { bookings, clients, projects, portfolio, news } = useAdmin();
   const navigate = useNavigate();
   const pending = bookings.filter(
     (item) => item.status === "Por confirmar",
   ).length;
   const active = clients.filter((item) => item.status === "Em aberto").length;
-  const total = clients.reduce(
+  const total = projects.reduce(
     (sum, item) => sum + Number(item.budget || 0),
     0,
   );
@@ -170,24 +170,24 @@ export default function Dashboard() {
         <Panel
           title="Projetos em curso"
           action={
-            <Link to="/clientes" className="text-link">
-              Ver clientes <ArrowRight size={15} />
+            <Link to="/projetos" className="text-link">
+              Ver projetos <ArrowRight size={15} />
             </Link>
           }
         >
-          {clients.filter(
-            (item) => item.project && item.status !== "Finalizado",
+          {projects.filter(
+            (item) => item.status !== "Concluído",
           ).length ? (
-            clients
-              .filter((item) => item.project && item.status !== "Finalizado")
+            projects
+              .filter((item) => item.status !== "Concluído")
               .map((item) => (
                 <div className="progress-row" key={item.id}>
                   <div className="progress-info">
-                    <span className="progress-avatar">{item.name[0]}</span>
+                    <span className="progress-avatar">{item.title[0]}</span>
                     <div>
-                      <b>{item.project}</b>
+                      <b>{item.title}</b>
                       <small>
-                        {item.name} · {elapsedDays(item.startDate)} dias
+                        {item.client?.name || "Projeto interno"} · {elapsedDays(item.startDate)} dias
                         decorridos
                       </small>
                     </div>

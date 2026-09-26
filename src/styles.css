@@ -1811,3 +1811,16 @@ td code {
 .tracking-admin-entry p { margin: 7px 0; }
 .tracking-admin-secret { margin: 16px 0; padding: 14px; background: #eadeff; color: #2e166a; border-radius: 8px; overflow-wrap: anywhere; }
 .tracking-admin-error { padding: 12px; color: #9c2d21; background: #fff0ed; }
+
+/* Agenda, objetivos e galerias com upload */
+.meeting-time-editor, .objective-row { display:flex; align-items:center; gap:12px; }
+.meeting-time-editor input { width: 142px; flex: none; }
+.meeting-time-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.meeting-time-chips button { border:1px solid #d4c9eb; border-radius:100px; padding:8px 14px; color:#390f97; background:#f6f2ff; cursor:pointer; }
+.booking-day-label { display:flex; align-items:center; gap:10px; color:#390f97; text-transform:capitalize; }
+.objective-row { justify-content:space-between; padding:9px 0; border-bottom:1px solid #ece7f3; }
+.objective-row input { flex:1; min-width:0; }
+.uploaded-image-name { flex:1; min-width:0; font-weight:650; }
+.uploaded-image-name small { display:block; overflow-wrap:anywhere; color:#827695; font-weight:400; }
+.image-upload-button { display:inline-flex; align-items:center; gap:8px; cursor:pointer; }
+.image-upload-button input { display:none; }

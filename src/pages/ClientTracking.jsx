@@ -7,8 +7,9 @@ import { PageIntro, Panel } from "../components/UI";
 // As senhas só existem nesta resposta, e nunca são guardadas no navegador.
 export default function ClientTracking() {
   const { id } = useParams();
-  const { clients } = useAdmin();
-  const client = clients.find((item) => item.id === id);
+  const { projects } = useAdmin();
+  const project = projects.find((item) => item.id === id);
+  const client = project?.client;
   const [reports, setReports] = useState([]);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -20,23 +21,23 @@ export default function ClientTracking() {
   const [replyText, setReplyText] = useState({});
   async function refresh() {
     const [reportsResult, tracking] = await Promise.all([
-      api(`/admin/clients/${id}/reports`),
-      client?.trackingCode ? api(`/public/tracking/${encodeURIComponent(client.trackingCode)}`) : Promise.resolve({ project: {} }),
+      api(`/admin/projects/${id}/reports`),
+      project?.code ? api(`/public/tracking/${encodeURIComponent(project.code)}`) : Promise.resolve({ project: {} }),
     ]);
     setReports(reportsResult);
     setUpdates(tracking.project.updates || []);
     setAlerts(tracking.project.alerts || []);
   }
-  useEffect(() => { if (client) refresh().catch((reason) => setError(reason.message)); }, [id, client?.trackingCode]);
-  if (!client) return <PageIntro title="Cliente não encontrado" action={<Link to="/clientes">Voltar aos clientes</Link>} />;
+  useEffect(() => { if (project) refresh().catch((reason) => setError(reason.message)); }, [id, project?.code]);
+  if (!project) return <PageIntro title="Projeto não encontrado" action={<Link to="/projetos">Voltar aos projetos</Link>} />;
   async function createPassword() {
     if (!window.confirm("Gerar uma nova senha? A anterior deixará de funcionar.")) return;
-    try { const result = await api(`/admin/clients/${id}/password`, { method: "POST" }); setPassword(result.password); setError(""); } catch (reason) { setError(reason.message); }
+    try { const result = await api(`/admin/clients/${project.clientId}/password`, { method: "POST" }); setPassword(result.password); setError(""); } catch (reason) { setError(reason.message); }
   }
   async function post(event) {
     event.preventDefault();
     try {
-      await api(`/admin/clients/${id}/${kind}`, { method: "POST", body: kind === "updates" ? { title, description: message } : { title, message } });
+      await api(`/admin/projects/${id}/${kind}`, { method: "POST", body: kind === "updates" ? { title, description: message } : { title, message } });
       setTitle(""); setMessage(""); await refresh(); setError("");
     } catch (reason) { setError(reason.message); }
   }
@@ -45,12 +46,12 @@ export default function ClientTracking() {
     try { await api(`/admin/reports/${reportId}/replies`, { method: "POST", body: { message: replyText[reportId] } }); setReplyText((old) => ({ ...old, [reportId]: "" })); await refresh(); setError(""); } catch (reason) { setError(reason.message); }
   }
   return <>
-    <PageIntro eyebrow="CLIENTE / TRACKING" title={client.project || client.name} description={`Acompanhamento de ${client.name}`} action={<Link to="/clientes" className="button subtle">← Voltar</Link>} />
+    <PageIntro eyebrow="CLIENTE / TRACKING" title={project.title} description={`Acompanhamento de ${client?.name || "projeto interno"}`} action={<Link to="/projetos" className="button subtle">← Voltar</Link>} />
     {error && <p className="tracking-admin-error" role="alert">{error}</p>}
     <div className="two-column"><Panel title="Acesso do cliente">
-      <p>Código de acompanhamento: <strong>{client.trackingCode}</strong></p>
-      <p>Pagamento: {Number(client.amountPaid || 0).toLocaleString("pt-AO")} Kz de {Number(client.budget || 0).toLocaleString("pt-AO")} Kz · {client.progress}% concluído.</p>
-      <button className="button primary" onClick={createPassword}>Gerar / substituir senha do cliente</button>
+      <p>Código de acompanhamento: <strong>{project.code}</strong></p>
+      <p>Pagamento: {Number(project.amountPaid || 0).toLocaleString("pt-AO")} Kz de {Number(project.budget || 0).toLocaleString("pt-AO")} Kz · {project.progress}% concluído.</p>
+      {project.clientId && <button className="button primary" onClick={createPassword}>Gerar / substituir senha do cliente</button>}
       {password && <div className="tracking-admin-secret" role="status"><strong>Senha para enviar pelo WhatsApp: {password}</strong><p>Copia agora. Esta senha não volta a aparecer.</p></div>}
     </Panel><Panel title="Publicar atualização ou aviso"><form onSubmit={post} className="form-stack">
       <label>Tipo<select value={kind} onChange={(event) => setKind(event.target.value)}><option value="updates">Atualização</option><option value="alerts">Aviso</option></select></label>

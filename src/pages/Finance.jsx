@@ -19,7 +19,7 @@ import {
 import { formatDate, id, money, today } from "../lib/storage";
 
 export default function Finance() {
-  const { clients, transactions, setTransactions } = useAdmin();
+  const { clients, projects, transactions, setTransactions } = useAdmin();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     type: "Despesa",
@@ -28,7 +28,7 @@ export default function Finance() {
     date: today(),
     clientId: "",
   });
-  const budgets = clients.reduce(
+  const budgets = projects.reduce(
     (sum, item) => sum + Number(item.budget || 0),
     0,
   );
@@ -72,7 +72,7 @@ export default function Finance() {
           </span>
           <small>ORÇAMENTOS PREVISTOS</small>
           <b>{money(budgets)}</b>
-          <p>Somatório dos orçamentos na ficha de cada cliente.</p>
+          <p>Somatório dos orçamentos dos projetos registados.</p>
         </div>
         <div className="finance-card">
           <span className="finance-icon cost">
@@ -137,22 +137,22 @@ export default function Finance() {
           )}
         </Panel>
         <Panel title="Orçamentos por projeto">
-          {clients.filter((item) => item.budget).length ? (
-            clients
+          {projects.filter((item) => item.budget).length ? (
+            projects
               .filter((item) => item.budget)
               .map((item) => (
                 <div className="budget-row" key={item.id}>
                   <div>
-                    <b>{item.project || item.name}</b>
+                    <b>{item.title}</b>
                     <small>
-                      {item.name} · {item.status}
+                      {item.client?.name || "Projeto interno"} · {item.status}
                     </small>
                   </div>
                   <strong>{money(item.budget)}</strong>
                 </div>
               ))
           ) : (
-            <Empty>Adiciona o orçamento na ficha de cada cliente.</Empty>
+            <Empty>Adiciona o orçamento na ficha de cada projeto.</Empty>
           )}
           <p className="aside-note">
             Orçamento é uma proposta prevista; depois será possível acompanhar
@@ -207,17 +207,17 @@ export default function Finance() {
                 />
               </Field>
             </div>
-            <Field label="Projeto relacionado (opcional)">
+            <Field label="Cliente relacionado (opcional)">
               <select
                 value={form.clientId}
                 onChange={(event) =>
                   setForm({ ...form, clientId: event.target.value })
                 }
               >
-                <option value="">Sem projeto associado</option>
+                <option value="">Sem cliente associado</option>
                 {clients.map((client) => (
                   <option value={client.id} key={client.id}>
-                    {client.name} · {client.project}
+                    {client.name}
                   </option>
                 ))}
               </select>

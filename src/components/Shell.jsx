@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   Menu,
   Monitor,
+  FolderKanban,
   Newspaper,
   Settings2,
   Smartphone,
@@ -25,7 +26,8 @@ const groups = [
     links: [
       { to: "/", label: "Visão geral", icon: LayoutDashboard },
       { to: "/reunioes", label: "Reuniões e agenda", icon: CalendarDays },
-      { to: "/clientes", label: "Clientes e projetos", icon: ContactRound },
+      { to: "/clientes", label: "Clientes", icon: ContactRound },
+      { to: "/projetos", label: "Projetos e tracking", icon: FolderKanban },
     ],
   },
   {
