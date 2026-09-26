@@ -1897,3 +1897,23 @@ td code {
 .team-active { display: flex; align-items: center; gap: 10px; }
 .team-secret { padding: 18px; border-radius: 12px; border: 1px solid #a18ac6; background: #ede5fc; overflow-wrap: anywhere; }
 @media (max-width: 700px) { .project-brief-grid { grid-template-columns: 1fr; } .team-person { flex-wrap: wrap; } .team-history article { flex-wrap: wrap; } }
+.news-editor-page { max-width:1050px; display:grid; gap:22px; padding-bottom:70px; }
+.news-editor-page .panel { overflow:visible; }
+.news-blocks { display:grid; gap:16px; }
+.news-editor-block { background:#f8f7fd; border:1px solid #e2dcf0; border-radius:18px; padding:24px; display:grid; gap:16px; }
+.news-editor-block-head { display:flex; justify-content:space-between; align-items:center; gap:14px; color:#302451; }
+.news-editor-block-head div { display:flex; gap:5px; }
+.news-editor-block-head button { border:1px solid #ddd3f1; border-radius:9px; background:white; color:#6243ae; width:34px; height:34px; display:grid; place-items:center; cursor:pointer; }
+.news-editor-block-head button:disabled { opacity:.35; cursor:default; }
+.news-editor-block textarea,.news-editor-block input { background:white; }
+.news-add-block { display:flex; flex-wrap:wrap; gap:12px; align-items:center; padding:12px 0; }
+.news-add-block label { font-weight:700; color:#302451; }
+.news-add-block select { max-width:240px; }
+.news-editor-footer { display:flex; justify-content:flex-end; gap:12px; }
+.system-dialog-backdrop { position:fixed; inset:0; z-index:9999; display:grid; place-items:center; padding:20px; background:#100b26ae; backdrop-filter:blur(6px); }
+.system-dialog { width:min(100%,430px); padding:32px; border-radius:24px; background:#fff; box-shadow:0 30px 100px #130a3159; border:1px solid #e5dcf2; color:#251a43; }
+.system-dialog-icon { width:48px; height:48px; display:grid; place-items:center; border-radius:14px; background:#eee8fc; color:#6742b5; }
+.system-dialog h2 { margin:18px 0 8px; font-size:23px; }
+.system-dialog p { line-height:1.6; color:#574c6e; white-space:pre-line; }
+.system-dialog-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; }
+@media (max-width:600px) { .news-editor-block { padding:16px; } .news-add-block select,.news-add-block button { width:100%; max-width:none; } }
