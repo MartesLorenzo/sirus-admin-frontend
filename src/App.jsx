@@ -9,6 +9,8 @@ import ClientTracking from "./pages/ClientTracking";
 import Projects from "./pages/Projects";
 import Portfolio from "./pages/Portfolio";
 import News from "./pages/News";
+import NewsEditor from "./pages/NewsEditor";
+import { SystemDialogProvider } from "./components/SystemDialog";
 import SocialProof from "./pages/SocialProof";
 import Finance from "./pages/Finance";
 import Settings from "./pages/Settings";
@@ -122,9 +124,9 @@ function AdminProvider({ children }) {
   if (!session) return <Login onLogin={login} error={error} />;
   return <AdminContext.Provider value={value}>{error && <div className="admin-sync-error" role="alert">{error}</div>}{children}</AdminContext.Provider>;
 }
-function Access({ area, children }) {
-  const { user } = useAdmin();
-  return permitted(user, area) ? children : <Navigate to={firstAllowed(user)} replace />;
+function Access({ area, action = "view", children }) {
+  const { user, can } = useAdmin();
+  return permitted(user, area) && can(area, action) ? children : <Navigate to={firstAllowed(user)} replace />;
 }
 function PortfolioAccess() {
   const { category } = useParams();
@@ -147,7 +149,7 @@ function Login({ onLogin, error }) {
 
 export default function App() {
   return (
-    <AdminProvider>
+    <SystemDialogProvider><AdminProvider>
       <BrowserRouter>
         <Routes>
           <Route element={<Shell />}>
@@ -161,6 +163,8 @@ export default function App() {
             <Route path="equipa" element={<Access area="team"><Team /></Access>} />
             <Route path="sem-acesso" element={<div className="panel"><h2>Sem acesso a secções</h2><p>Fala com um administrador para receber permissões.</p></div>} />
             <Route path="noticias" element={<Access area="news"><News /></Access>} />
+            <Route path="noticias/nova" element={<Access area="news" action="create"><NewsEditor /></Access>} />
+            <Route path="noticias/:id/editar" element={<Access area="news" action="edit"><NewsEditor /></Access>} />
             <Route path="testemunhos" element={<Access area="testimonials"><SocialProof /></Access>} />
             <Route path="gestao" element={<Access area="finance"><Finance /></Access>} />
             <Route path="configuracoes" element={<Access area="settings"><Settings /></Access>} />
@@ -168,6 +172,6 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </AdminProvider>
+    </AdminProvider></SystemDialogProvider>
   );
 }
