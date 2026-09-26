@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useParams } from "react-router-dom";
 import Shell from "./components/Shell";
 import { api, configured, token } from "./lib/api";
 import Dashboard from "./pages/Dashboard";
@@ -126,6 +126,13 @@ function Access({ area, children }) {
   const { user } = useAdmin();
   return permitted(user, area) ? children : <Navigate to={firstAllowed(user)} replace />;
 }
+function PortfolioAccess() {
+  const { category } = useParams();
+  const area = ({ websites: "portfolio_web", mobile: "portfolio_mobile", pc: "portfolio_pc" })[category];
+  const { user } = useAdmin();
+  if (!area) return <Navigate to={firstAllowed(user)} replace />;
+  return permitted(user, area) ? <Portfolio /> : <Navigate to={firstAllowed(user)} replace />;
+}
 function Login({ onLogin, error }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -150,7 +157,7 @@ export default function App() {
             <Route path="clientes/:id/acompanhamento" element={<Access area="projects"><ClientTracking /></Access>} />
             <Route path="projetos" element={<Access area="projects"><Projects /></Access>} />
             <Route path="projetos/:id/acompanhamento" element={<Access area="projects"><ClientTracking /></Access>} />
-            <Route path="portfolio/:category" element={<Portfolio />} />
+            <Route path="portfolio/:category" element={<PortfolioAccess />} />
             <Route path="equipa" element={<Access area="team"><Team /></Access>} />
             <Route path="sem-acesso" element={<div className="panel"><h2>Sem acesso a secções</h2><p>Fala com um administrador para receber permissões.</p></div>} />
             <Route path="noticias" element={<Access area="news"><News /></Access>} />
