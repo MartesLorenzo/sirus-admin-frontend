@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CalendarDays, Clock3, Copy, Plus, Search, Trash2 } from "lucide-react";
 import { useAdmin } from "../App";
+import { api } from "../lib/api";
 import {
   Badge,
   Empty,
@@ -14,7 +15,7 @@ import {
 import { formatDate, id } from "../lib/storage";
 
 export default function Meetings() {
-  const { bookings, setBookings, availability, setAvailability } = useAdmin();
+  const { bookings, setBookings, availability, setAvailability, refresh, can } = useAdmin();
   const [params] = useSearchParams();
   const [query, setQuery] = useState(params.get("codigo") || "");
   const [tab, setTab] = useState("pedidos");
@@ -134,12 +135,8 @@ export default function Meetings() {
                       </Badge>
                     </td>
                     <td>
-                      <button
-                        className="table-action"
-                        onClick={() => setSelected(item)}
-                      >
-                        Ver briefing →
-                      </button>
+                      <button className="table-action" onClick={() => setSelected(item)}>Ver briefing →</button>
+                      {can("meetings", "delete") && <button className="icon-button danger" type="button" aria-label={`Eliminar reunião ${item.code}`} onClick={async () => { if (!window.confirm(`Eliminar a reunião ${item.code}? O projeto associado ficará guardado.`)) return; try { await api(`/admin/meetings/${item.id}`, { method: "DELETE" }); await refresh(); } catch (error) { window.alert(error.message); } }}><Trash2 size={16}/></button>}
                     </td>
                   </tr>
                 ))}
@@ -152,7 +149,7 @@ export default function Meetings() {
         </Panel>
       ) : (
         <div className="two-column">
-          <Panel title="Abrir um novo dia">
+          {can("meetings", "edit") && <Panel title="Abrir um novo dia">
             <form className="form-stack" onSubmit={addDay}>
               <Field label="Data">
                 <input
@@ -169,7 +166,7 @@ export default function Meetings() {
                 <Plus size={16} /> Adicionar disponibilidade
               </button>
             </form>
-          </Panel>
+          </Panel>}
           <Panel title="Datas disponíveis">
             {availability.length ? (
               availability.map((day) => (
@@ -179,7 +176,7 @@ export default function Meetings() {
                     <b>{formatDate(day.date)}</b>
                     <small>{day.times.join(" · ")}</small>
                   </div>
-                  <button
+                  {can("meetings", "edit") && <button
                     className="button subtle small"
                     onClick={() =>
                       setAvailability(
@@ -192,8 +189,8 @@ export default function Meetings() {
                     }
                   >
                     {day.enabled ? "Ativo" : "Pausado"}
-                  </button>
-                  <button
+                  </button>}
+                  {can("meetings", "edit") && can("meetings", "delete") && <button
                     className="icon-button danger"
                     onClick={() => {
                       if (window.confirm("Remover esta data?"))
@@ -204,7 +201,7 @@ export default function Meetings() {
                     aria-label="Remover data"
                   >
                     <Trash2 size={16} />
-                  </button>
+                  </button>}
                 </div>
               ))
             ) : (
@@ -251,6 +248,8 @@ export default function Meetings() {
                 `${formatDate(selected.date)} às ${selected.time}`,
               ],
               ["Cores desejadas", selected.colors],
+              ["Funcionalidades pedidas", selected.features],
+              ["Referências", selected.references],
             ].map(([label, value]) => (
               <div key={label}>
                 <small>{label}</small>
@@ -262,7 +261,7 @@ export default function Meetings() {
             <small>DESCRIÇÃO DO PROJETO</small>
             <p>{selected.description}</p>
           </div>
-          <Field label="Estado da reunião">
+          {can("meetings", "edit") && <Field label="Estado da reunião">
             <select
               value={selected.status}
               onChange={(event) => {
@@ -281,7 +280,7 @@ export default function Meetings() {
                 ),
               )}
             </select>
-          </Field>
+          </Field>}
           <div className="form-actions">
             <button
               type="button"

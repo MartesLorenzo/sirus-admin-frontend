@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { permitted, firstAllowed } from "../lib/access";
 import { useAdmin } from "../App";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
@@ -11,6 +12,7 @@ import {
   Globe2,
   LayoutDashboard,
   Menu,
+  UsersRound,
   Monitor,
   FolderKanban,
   Newspaper,
@@ -51,7 +53,7 @@ const groups = [
 
 export default function Shell() {
   const [open, setOpen] = useState(false);
-  const { logout } = useAdmin();
+  const { logout, user } = useAdmin();
   const location = useLocation();
   const current = groups
     .flatMap((group) => group.links)
@@ -60,7 +62,7 @@ export default function Shell() {
     <div className="app-shell">
       <aside className={`sidebar ${open ? "open" : ""}`}>
         <div className="sidebar-top">
-          <NavLink to="/" className="logo" onClick={() => setOpen(false)}>
+          <NavLink to={firstAllowed(user)} className="logo" onClick={() => setOpen(false)}>
             <img className="logo-cloud" src="/sirus-emblem.png" alt="" />
             <span>
               SIRUS <em>CLOUD</em>
@@ -79,7 +81,7 @@ export default function Shell() {
           {groups.map((group) => (
             <div className="nav-group" key={group.title}>
               <div className="nav-caption">{group.title}</div>
-              {group.links.map(({ to, label, icon: Icon }) => (
+              {group.links.filter(({ to }) => permitted(user, ({ "/": "dashboard", "/reunioes": "meetings", "/clientes": "clients", "/projetos": "projects", "/portfolio/websites": "portfolio_web", "/portfolio/mobile": "portfolio_mobile", "/portfolio/pc": "portfolio_pc", "/noticias": "news", "/testemunhos": "testimonials", "/gestao": "finance", "/configuracoes": "settings" })[to])).map(({ to, label, icon: Icon }) => (
                 <NavLink
                   end
                   to={to}
@@ -95,6 +97,7 @@ export default function Shell() {
               ))}
             </div>
           ))}
+          {user?.role === "ADMIN" && <div className="nav-group"><div className="nav-caption">ADMINISTRAÇÃO</div><NavLink to="/equipa" onClick={() => setOpen(false)} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}><UsersRound size={18} /> Equipa & segurança</NavLink></div>}
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-help">
@@ -130,7 +133,7 @@ export default function Shell() {
               <Menu size={21} />
             </button>
             <span className="breadcrumb">
-              Sirus Cloud <span>/</span>{" "}
+              Painel <span>/</span>{" "}
               <strong>{current?.label || "Painel"}</strong>
             </span>
           </div>
@@ -150,7 +153,7 @@ export default function Shell() {
             <div className="user-chip">
               <span>ML</span>
               <div>
-                <b>Administrador</b>
+                <b>{user?.name || (user?.role === "ADMIN" ? "Administrador" : user?.jobTitle || "Funcionário")}</b>
                 <small>Sirus Cloud</small>
               </div>
             </div>

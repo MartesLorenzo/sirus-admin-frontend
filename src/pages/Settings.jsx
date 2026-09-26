@@ -13,7 +13,7 @@ import { useAdmin } from "../App";
 import { Field, PageIntro, Panel } from "../components/UI";
 
 export default function Settings() {
-  const { settings, setSettings } = useAdmin();
+  const { settings, setSettings, can } = useAdmin();
   const [form, setForm] = useState({ ...settings });
   const [saved, setSaved] = useState(false);
   const change = (key) => (event) => {
@@ -27,7 +27,7 @@ export default function Settings() {
         title="Contactos & canais"
         description="Organiza os números e endereços que mais tarde serão publicados e usados nas ações do website."
         action={
-          <button className="button primary" type="submit" form="settings-form">
+          can("settings", "edit") && <button className="button primary" type="submit" form="settings-form">
             <Save size={16} /> Guardar contactos
           </button>
         }

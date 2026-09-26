@@ -8,6 +8,7 @@ import {
   Plus,
   Smartphone,
   Star,
+  Trash2,
 } from "lucide-react";
 import { useAdmin } from "../App";
 import ImageFields from "../components/ImageFields";
@@ -43,7 +44,7 @@ const blank = {
 
 export default function Portfolio() {
   const { category } = useParams();
-  const { portfolio, setPortfolio } = useAdmin();
+  const { portfolio, setPortfolio, can } = useAdmin();
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(blank);
   const [checkText, setCheckText] = useState("");
@@ -98,6 +99,10 @@ export default function Portfolio() {
     );
     setEditing(null);
   }
+  const accessArea = `portfolio_${category === "websites" ? "web" : category}`;
+  function remove(item) {
+    if (window.confirm(`Eliminar o trabalho ${item.title}?`)) setPortfolio(portfolio.filter((entry) => entry.id !== item.id));
+  }
   return (
     <>
       <PageIntro
@@ -105,7 +110,7 @@ export default function Portfolio() {
         title={type.title}
         description={`Apresenta trabalhos de ${type.label.toLowerCase()} com contexto, visão, funcionalidades e uma galeria sem limite fixo de imagens.`}
         action={
-          <button className="button primary" onClick={() => open()}>
+          can(accessArea, "create") && <button className="button primary" onClick={() => open()}>
             <Plus size={16} /> Novo trabalho
           </button>
         }
@@ -141,7 +146,7 @@ export default function Portfolio() {
             <div className="work-body">
               <div className="work-meta">
                 <Badge>{item.status}</Badge>
-                <button
+                {can(accessArea, "edit") && <button
                   className={`feature-button ${item.featured ? "featured" : ""}`}
                   onClick={() => toggleCategoryFeature(item)}
                   title="Alternar destaque"
@@ -151,7 +156,7 @@ export default function Portfolio() {
                     fill={item.featured ? "currentColor" : "none"}
                   />{" "}
                   {item.featured ? "Em destaque" : "Destacar"}
-                </button>
+                </button>}
               </div>
               <h3>{item.title}</h3>
               <p>{item.description}</p>
@@ -159,9 +164,8 @@ export default function Portfolio() {
                 <small>
                   {item.images.length} imagens · {item.checklist.length} pontos
                 </small>
-                <button className="table-action" onClick={() => open(item)}>
-                  Editar <ArrowUpRight size={16} />
-                </button>
+                {can(accessArea, "edit") && <button className="table-action" onClick={() => open(item)}>Editar <ArrowUpRight size={16} /></button>}
+                {can(accessArea, "delete") && <button type="button" className="icon-button danger" aria-label={`Eliminar ${item.title}`} onClick={() => remove(item)}><Trash2 size={16} /></button>}
               </div>
             </div>
           </article>
@@ -170,9 +174,7 @@ export default function Portfolio() {
           <div className="empty large">
             <Image size={28} />
             Ainda não há trabalhos nesta categoria.
-            <button className="button primary" onClick={() => open()}>
-              Criar primeiro trabalho
-            </button>
+            {can(accessArea, "create") && <button className="button primary" onClick={() => open()}>Criar primeiro trabalho</button>}
           </div>
         )}
       </div>

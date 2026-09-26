@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarDays, FileText, Plus, Star } from "lucide-react";
+import { CalendarDays, FileText, Plus, Star, Trash2 } from "lucide-react";
 import { useAdmin } from "../App";
 import ImageFields from "../components/ImageFields";
 import {
@@ -27,7 +27,7 @@ const blank = {
   date: today(),
 };
 export default function News() {
-  const { news, setNews } = useAdmin();
+  const { news, setNews, can } = useAdmin();
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(blank);
   const [checkText, setCheckText] = useState("");
@@ -78,6 +78,9 @@ export default function News() {
     );
     setEditing(null);
   }
+  function remove(item) {
+    if (window.confirm(`Eliminar a notícia ${item.title}?`)) setNews(news.filter((entry) => entry.id !== item.id));
+  }
   return (
     <>
       <PageIntro
@@ -85,7 +88,7 @@ export default function News() {
         title="Notícias & histórias"
         description="Constrói artigos com título, secções, listas e imagens. Escolhe até três notícias principais."
         action={
-          <button className="button primary" onClick={() => open()}>
+          can("news", "create") && <button className="button primary" onClick={() => open()}>
             <Plus size={16} /> Nova notícia
           </button>
         }
@@ -131,7 +134,7 @@ export default function News() {
                   >
                     {item.status}
                   </Badge>
-                  <button
+                  {can("news", "edit") && <button
                     className={`feature-button ${item.featured ? "featured" : ""}`}
                     onClick={() => toggleFeatured(news, setNews, item.id)}
                   >
@@ -140,10 +143,9 @@ export default function News() {
                       fill={item.featured ? "currentColor" : "none"}
                     />{" "}
                     {item.featured ? "Principal" : "Destacar"}
-                  </button>
-                  <button className="table-action" onClick={() => open(item)}>
-                    Editar →
-                  </button>
+                  </button>}
+                  {can("news", "edit") && <button className="table-action" onClick={() => open(item)}>Editar →</button>}
+                  {can("news", "delete") && <button type="button" className="icon-button danger" aria-label={`Eliminar ${item.title}`} onClick={() => remove(item)}><Trash2 size={16} /></button>}
                 </div>
               </article>
             ))}

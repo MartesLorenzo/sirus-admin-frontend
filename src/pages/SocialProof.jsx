@@ -9,7 +9,7 @@ const newCompany = { name: "", logo: "", website: "", featured: false, published
 const newTestimonial = { name: "", role: "", quote: "", images: [], featured: false, published: false };
 
 export default function SocialProof() {
-  const { companies, setCompanies, testimonials, setTestimonials } = useAdmin();
+  const { companies, setCompanies, testimonials, setTestimonials, can } = useAdmin();
   const [tab, setTab] = useState("testimonials");
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(null);
@@ -40,7 +40,7 @@ export default function SocialProof() {
       change(items.filter((entry) => entry.id !== item.id));
   }
   return <>
-    <PageIntro eyebrow="CONFIANÇA / CONTEÚDO" title="Testemunhos & empresas" description="Publica relatos reais com imagens e apresenta as empresas que confiam em nós. Os três destaques surgem primeiro." action={<button className="button primary" onClick={() => open()}><Plus size={16} /> {isCompany ? "Nova empresa" : "Novo testemunho"}</button>} />
+    <PageIntro eyebrow="CONFIANÇA / CONTEÚDO" title="Testemunhos & empresas" description="Publica relatos reais com imagens e apresenta as empresas que confiam em nós. Os três destaques surgem primeiro." action={can("testimonials", "create") && <button className="button primary" onClick={() => open()}><Plus size={16} /> {isCompany ? "Nova empresa" : "Novo testemunho"}</button>} />
     <div className="segmented social-tabs">
       <button className={tab === "testimonials" ? "selected" : ""} onClick={() => { setTab("testimonials"); setEditing(null); }}><MessageSquareQuote size={16} /> Testemunhos <span>{testimonials.length}</span></button>
       <button className={tab === "companies" ? "selected" : ""} onClick={() => { setTab("companies"); setEditing(null); }}><Building2 size={16} /> Empresas <span>{companies.length}</span></button>
@@ -50,7 +50,7 @@ export default function SocialProof() {
         {isCompany ? <div className="social-admin-logo"><img src={item.logo} alt={`Logótipo ${item.name}`} /></div> : item.images?.length ? <div className="social-admin-preview"><img src={item.images[0]} alt="" /><span>{item.images.length} {item.images.length === 1 ? "imagem" : "imagens"}</span></div> : <div className="social-admin-preview empty-image"><MessageSquareQuote size={30} /></div>}
         <div className="social-admin-info"><div className="social-admin-tags"><Badge tone={item.published ? "success" : "neutral"}>{item.published ? "Publicado" : "Rascunho"}</Badge>{item.featured && <span className="social-admin-featured"><Star size={14} fill="currentColor" /> Destaque</span>}</div>
           <h3>{item.name}</h3>{isCompany ? <p>{item.website || "Sem website associado"}</p> : <><small>{item.role}</small><p>“{item.quote}”</p></>}
-          <div className="social-admin-actions"><button className="table-action" onClick={() => open(item)}>Editar →</button><button type="button" className="table-action danger-text" onClick={() => remove(item)}><Trash2 size={15} /> Eliminar</button></div>
+          <div className="social-admin-actions">{can("testimonials", "edit") && <button className="table-action" onClick={() => open(item)}>Editar →</button>}{can("testimonials", "delete") && <button type="button" className="table-action danger-text" onClick={() => remove(item)}><Trash2 size={15} /> Eliminar</button>}</div>
         </div>
       </article>)}</div>{!items.length && <Empty>{isCompany ? "Acrescenta a primeira empresa." : "Acrescenta o primeiro testemunho."}</Empty>}
     </Panel>

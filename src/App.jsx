@@ -12,6 +12,8 @@ import News from "./pages/News";
 import SocialProof from "./pages/SocialProof";
 import Finance from "./pages/Finance";
 import Settings from "./pages/Settings";
+import Team from "./pages/Team";
+import { areaFromPath, permitted, firstAllowed } from "./lib/access";
 
 const AdminContext = createContext(null);
 export const useAdmin = () => useContext(AdminContext);
@@ -54,6 +56,7 @@ function payload(key, item) {
 function AdminProvider({ children }) {
   const [state, setState] = useState(initial);
   const [session, setSession] = useState(Boolean(token()));
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(Boolean(token()));
   const [error, setError] = useState("");
   const stateRef = useRef(state);
@@ -66,12 +69,12 @@ function AdminProvider({ children }) {
   }
   useEffect(() => {
     if (!session) { setLoading(false); return; }
-    refresh().catch((reason) => { setError(reason.message); sessionStorage.removeItem("sirus-admin-token"); setSession(false); }).finally(() => setLoading(false));
+    Promise.all([refresh(), api("/auth/me").then(setUser)]).catch((reason) => { setError(reason.message); sessionStorage.removeItem("sirus-admin-token"); setSession(false); }).finally(() => setLoading(false));
   }, [session]);
   async function login(email, password) {
     const result = await api("/auth/login", { method: "POST", body: { email, password } });
     sessionStorage.setItem("sirus-admin-token", result.token);
-    setError(""); setLoading(true); setSession(true);
+    setUser(result.user); setError(""); setLoading(true); setSession(true);
   }
   function change(key, update) {
     const previous = stateRef.current[key];
@@ -100,10 +103,14 @@ function AdminProvider({ children }) {
       await refresh(); setError("");
     }).catch(async (reason) => { setError(reason.message); await refresh().catch(() => {}); });
   }
-  const value = { ...state, logout: () => { sessionStorage.removeItem("sirus-admin-token"); setSession(false); setState(initial); }, ...Object.fromEntries(Object.keys(initial).map((key) => [`set${key[0].toUpperCase()}${key.slice(1)}`, (value) => change(key, value)])), refresh, error };
+  const value = { ...state, user, can: (area, action) => permitted(user, area, action), logout: () => { sessionStorage.removeItem("sirus-admin-token"); setSession(false); setUser(null); setState(initial); }, ...Object.fromEntries(Object.keys(initial).map((key) => [`set${key[0].toUpperCase()}${key.slice(1)}`, (value) => change(key, value)])), refresh, error };
   if (loading) return <div className="admin-auth"><p>A carregar o painel…</p></div>;
   if (!session) return <Login onLogin={login} error={error} />;
   return <AdminContext.Provider value={value}>{error && <div className="admin-sync-error" role="alert">{error}</div>}{children}</AdminContext.Provider>;
+}
+function Access({ area, children }) {
+  const { user } = useAdmin();
+  return permitted(user, area) ? children : <Navigate to={firstAllowed(user)} replace />;
 }
 function Login({ onLogin, error }) {
   const [email, setEmail] = useState("");
@@ -123,17 +130,19 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<Shell />}>
-            <Route index element={<Dashboard />} />
-            <Route path="reunioes" element={<Meetings />} />
-            <Route path="clientes" element={<Clients />} />
-            <Route path="clientes/:id/acompanhamento" element={<ClientTracking />} />
-            <Route path="projetos" element={<Projects />} />
-            <Route path="projetos/:id/acompanhamento" element={<ClientTracking />} />
+            <Route index element={<Access area="dashboard"><Dashboard /></Access>} />
+            <Route path="reunioes" element={<Access area="meetings"><Meetings /></Access>} />
+            <Route path="clientes" element={<Access area="clients"><Clients /></Access>} />
+            <Route path="clientes/:id/acompanhamento" element={<Access area="projects"><ClientTracking /></Access>} />
+            <Route path="projetos" element={<Access area="projects"><Projects /></Access>} />
+            <Route path="projetos/:id/acompanhamento" element={<Access area="projects"><ClientTracking /></Access>} />
             <Route path="portfolio/:category" element={<Portfolio />} />
-            <Route path="noticias" element={<News />} />
-            <Route path="testemunhos" element={<SocialProof />} />
-            <Route path="gestao" element={<Finance />} />
-            <Route path="configuracoes" element={<Settings />} />
+            <Route path="equipa" element={<Access area="team"><Team /></Access>} />
+            <Route path="sem-acesso" element={<div className="panel"><h2>Sem acesso a secções</h2><p>Fala com um administrador para receber permissões.</p></div>} />
+            <Route path="noticias" element={<Access area="news"><News /></Access>} />
+            <Route path="testemunhos" element={<Access area="testimonials"><SocialProof /></Access>} />
+            <Route path="gestao" element={<Access area="finance"><Finance /></Access>} />
+            <Route path="configuracoes" element={<Access area="settings"><Settings /></Access>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

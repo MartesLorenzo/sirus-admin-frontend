@@ -5,6 +5,7 @@ import {
   Plus,
   ReceiptText,
   Wallet,
+  Trash2,
 } from "lucide-react";
 import { useAdmin } from "../App";
 import {
@@ -19,8 +20,9 @@ import {
 import { formatDate, id, money, today } from "../lib/storage";
 
 export default function Finance() {
-  const { clients, projects, transactions, setTransactions } = useAdmin();
+  const { clients, projects, transactions, setTransactions, can } = useAdmin();
   const [editing, setEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({
     type: "Despesa",
     title: "",
@@ -40,11 +42,9 @@ export default function Finance() {
     .reduce((sum, item) => sum + Number(item.amount), 0);
   function save(event) {
     event.preventDefault();
-    setTransactions([
-      { ...form, amount: Number(form.amount), id: id() },
-      ...transactions,
-    ]);
-    setEditing(false);
+    const item = { ...form, amount: Number(form.amount), id: editingId || id() };
+    setTransactions(editingId ? transactions.map((entry) => entry.id === editingId ? item : entry) : [item, ...transactions]);
+    setEditing(false); setEditingId(null);
     setForm({
       type: "Despesa",
       title: "",
@@ -60,7 +60,7 @@ export default function Finance() {
         title="Gestão financeira"
         description="Acompanha orçamentos previstos, despesas registadas e outros ganhos num só lugar."
         action={
-          <button className="button primary" onClick={() => setEditing(true)}>
+          can("finance", "create") && <button className="button primary" onClick={() => { setEditingId(null); setEditing(true); }}>
             <Plus size={16} /> Novo movimento
           </button>
         }
@@ -125,6 +125,8 @@ export default function Finance() {
                       : ""}
                   </small>
                 </div>
+                {can("finance", "edit") && <button type="button" className="table-action" onClick={() => { setForm({ type: item.type, title: item.title, amount: item.amount, date: item.date, clientId: item.clientId || "" }); setEditingId(item.id); setEditing(true); }}>Editar</button>}
+                {can("finance", "delete") && <button className="icon-button danger" type="button" aria-label={`Eliminar ${item.title}`} onClick={() => { if (window.confirm(`Eliminar movimento ${item.title}?`)) setTransactions(transactions.filter((entry) => entry.id !== item.id)); }}><Trash2 size={16}/></button>}
                 <strong
                   className={item.type === "Despesa" ? "expense" : "income"}
                 >
@@ -161,7 +163,7 @@ export default function Finance() {
         </Panel>
       </div>
       {editing && (
-        <Modal title="Novo movimento" onClose={() => setEditing(false)}>
+        <Modal title={editingId ? "Editar movimento" : "Novo movimento"} onClose={() => { setEditing(false); setEditingId(null); }}>
           <form className="form-stack" onSubmit={save}>
             <Field label="Tipo">
               <select
@@ -224,7 +226,7 @@ export default function Finance() {
             </Field>
             <FormActions
               onCancel={() => setEditing(false)}
-              submit="Registar movimento"
+              submit={editingId ? "Guardar movimento" : "Registar movimento"}
             />
           </form>
         </Modal>
