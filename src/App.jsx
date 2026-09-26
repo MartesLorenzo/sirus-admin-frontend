@@ -20,6 +20,18 @@ export const useAdmin = () => useContext(AdminContext);
 
 const initial = { bookings: [], availability: [], clients: [], projects: [], portfolio: [], news: [], companies: [], testimonials: [], transactions: [], settings: {} };
 const resources = { clients: "clients", projects: "projects", portfolio: "portfolio", news: "news", companies: "companies", testimonials: "testimonials", transactions: "transactions" };
+
+// Antes da introdução de funcionários, todas as contas existentes eram admins.
+// Mantém essas sessões antigas funcionais enquanto o backend é atualizado.
+function normalizeUser(user) {
+  if (!user) return null;
+  return {
+    ...user,
+    role: user.role || "ADMIN",
+    active: user.active !== false,
+    permissions: user.permissions || {},
+  };
+}
 function payload(key, item) {
   const { id, createdAt, updatedAt, trackingCode, accessPasswordHash, meetingId, passwordHash, objectives, client, code, progress, legacyProgress, ...fields } = item;
   if (key === "clients") return {
@@ -69,12 +81,14 @@ function AdminProvider({ children }) {
   }
   useEffect(() => {
     if (!session) { setLoading(false); return; }
-    Promise.all([refresh(), api("/auth/me").then(setUser)]).catch((reason) => { setError(reason.message); sessionStorage.removeItem("sirus-admin-token"); setSession(false); }).finally(() => setLoading(false));
+    Promise.all([refresh(), api("/auth/me").then((account) => setUser(normalizeUser(account)))])
+      .catch((reason) => { setError(reason.message); sessionStorage.removeItem("sirus-admin-token"); setSession(false); })
+      .finally(() => setLoading(false));
   }, [session]);
   async function login(email, password) {
     const result = await api("/auth/login", { method: "POST", body: { email, password } });
     sessionStorage.setItem("sirus-admin-token", result.token);
-    setUser(result.user); setError(""); setLoading(true); setSession(true);
+    setUser(normalizeUser(result.user)); setError(""); setLoading(true); setSession(true);
   }
   function change(key, update) {
     const previous = stateRef.current[key];
