@@ -8,6 +8,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useAdmin } from "../App";
+import { useSystemDialog } from "../components/SystemDialog";
 import {
   Badge,
   Empty,
@@ -21,6 +22,7 @@ import { formatDate, id, money, today } from "../lib/storage";
 
 export default function Finance() {
   const { clients, projects, transactions, setTransactions, can } = useAdmin();
+  const dialog = useSystemDialog();
   const [editing, setEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({
@@ -126,7 +128,7 @@ export default function Finance() {
                   </small>
                 </div>
                 {can("finance", "edit") && <button type="button" className="table-action" onClick={() => { setForm({ type: item.type, title: item.title, amount: item.amount, date: item.date, clientId: item.clientId || "" }); setEditingId(item.id); setEditing(true); }}>Editar</button>}
-                {can("finance", "delete") && <button className="icon-button danger" type="button" aria-label={`Eliminar ${item.title}`} onClick={() => { if (window.confirm(`Eliminar movimento ${item.title}?`)) setTransactions(transactions.filter((entry) => entry.id !== item.id)); }}><Trash2 size={16}/></button>}
+                {can("finance", "delete") && <button className="icon-button danger" type="button" aria-label={`Eliminar ${item.title}`} onClick={async () => { if (await dialog.confirm(`Eliminar movimento ${item.title}?`)) setTransactions(transactions.filter((entry) => entry.id !== item.id)); }}><Trash2 size={16}/></button>}
                 <strong
                   className={item.type === "Despesa" ? "expense" : "income"}
                 >
