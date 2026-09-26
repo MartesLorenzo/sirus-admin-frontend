@@ -69,7 +69,7 @@ export default function Dashboard() {
         <div className="orbit-art">
           <span className="orbit orbit-one" />
           <span className="orbit orbit-two" />
-          <span className="orbit-core">✦</span>
+          <span className="orbit-core"><img width={110} src="logo_1.png" alt="" /></span>
           <span className="orbit-label top">IDEIAS</span>
           <span className="orbit-label bottom">RESULTADOS</span>
         </div>
