@@ -1842,17 +1842,21 @@ td code {
 .social-admin-actions { justify-content:space-between; border-top:1px solid #eee8f5; padding-top:12px; margin-top:14px; }
 .social-admin-featured { display:inline-flex; align-items:center; gap:5px; font-size:12px; color:#6135a2; }
 
-/* Navegação escura com a marca original sobre uma superfície clara. */
-.sidebar { background: #171125; border-right-color: #302440; color: #e9e1f7; }
-.sidebar-top { margin: 16px 13px 26px; padding: 17px 12px; border-radius: 14px; background: #faf8ff; }
-.sidebar .nav-caption { color: #a89abb; }
-.sidebar .nav-item { color: #cec3de; }
-.sidebar .nav-item:hover { background: #2a203c; color: #fff; }
-.sidebar .nav-item.active { background: #46306c; color: #f3eaff; box-shadow: inset 0 0 0 1px #74549e; }
-.sidebar .nav-item.active::before { background: #b799ee; }
-.sidebar-help { background: #241a35; border-color: #403050; color: #d2baf7; }
-.sidebar-help p, .sidebar-site { color: #baaccd; }
-.sidebar-site:hover { color: #fff; }
+.project-brief { color: #261b39; }
+.project-brief-header { display:flex; justify-content:space-between; align-items:start; gap:16px; padding:22px; border-radius:16px; background:#201533; color:#fff; }
+.project-brief-header small { color:#bda6ee; letter-spacing:.12em; font-size:11px; font-weight:800; }
+.project-brief-header h2 { margin:10px 0 5px; font-size:24px; }
+.project-brief-header p { margin:0; color:#d2c3eb; }
+.project-brief-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:16px; }
+.project-brief-card { background:#fbfaff; border:1px solid #ece5f7; border-radius:14px; padding:18px; min-width:0; }
+.project-brief-wide { grid-column:1/-1; }
+.project-brief-card span { color:#6d4cae; letter-spacing:.12em; font-weight:800; font-size:10px; }
+.project-brief-card h3 { margin:9px 0; font-size:16px; }
+.project-brief-card p { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.65; margin:0; color:#5c526b; }
+.project-brief-objectives { margin:0; padding-left:20px; color:#5c526b; line-height:1.8; }
+.project-brief-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+@media (max-width:640px) { .project-brief-grid { grid-template-columns:1fr; } .project-brief-header { flex-direction:column; } }
+
 .project-workspace .two-column { align-items: start; gap: 24px; margin-bottom: 24px; }
 .project-workspace .panel { border-radius: 18px; padding: 24px; box-shadow: 0 12px 35px #29144208; }
 .project-access-panel { background: linear-gradient(140deg,#211530,#30204c); color: #e9e0f5; border-color: #48335f; }
