@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { useAdmin } from "../App";
+import { useSystemDialog } from "../components/SystemDialog";
 import { PageIntro, Panel, Field } from "../components/UI";
 
 // As senhas só existem nesta resposta, e nunca são guardadas no navegador.
 export default function ClientTracking() {
   const { id } = useParams();
   const { projects, can } = useAdmin();
+  const dialog = useSystemDialog();
   const project = projects.find((item) => item.id === id);
   const client = project?.client;
   const [reports, setReports] = useState([]);
@@ -31,7 +33,7 @@ export default function ClientTracking() {
   useEffect(() => { if (project) refresh().catch((reason) => setError(reason.message)); }, [id, project?.code]);
   if (!project) return <PageIntro title="Projeto não encontrado" action={<Link to="/projetos">Voltar aos projetos</Link>} />;
   async function createPassword() {
-    if (!window.confirm("Gerar uma nova senha? A anterior deixará de funcionar.")) return;
+    if (!await dialog.confirm("Gerar uma nova senha? A anterior deixará de funcionar.")) return;
     try { const result = await api(`/admin/clients/${project.clientId}/password`, { method: "POST" }); setPassword(result.password); setError(""); } catch (reason) { setError(reason.message); }
   }
   async function post(event) {
@@ -42,7 +44,7 @@ export default function ClientTracking() {
     } catch (reason) { setError(reason.message); }
   }
   async function removeEntry(path, label) {
-    if (!window.confirm(`Eliminar ${label}?`)) return;
+    if (!await dialog.confirm(`Eliminar ${label}?`)) return;
     try { await api(path, { method: "DELETE" }); await refresh(); setError(""); }
     catch (cause) { setError(cause.message); }
   }
