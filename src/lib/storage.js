@@ -49,13 +49,11 @@ export const elapsedDays = (value) =>
 export const today = () => new Date().toISOString().slice(0, 10);
 
 // Só três itens por coleção podem surgir em destaque no site público.
-export function toggleFeatured(items, setItems, itemId) {
+export function toggleFeatured(items, setItems, itemId, onLimit = () => {}) {
   const item = items.find((entry) => entry.id === itemId);
   if (!item) return;
   if (!item.featured && items.filter((entry) => entry.featured).length >= 3) {
-    window.alert(
-      "Podes destacar até 3 itens nesta secção. Retira um destaque primeiro.",
-    );
+    onLimit("Podes destacar até 3 itens nesta secção. Retira um destaque primeiro.");
     return;
   }
   setItems(
