@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Plus, Search, Trash2 } from "lucide-react";
 import { useAdmin } from "../App";
+import { useSystemDialog } from "../components/SystemDialog";
 import { Badge, Empty, Field, FormActions, Modal, PageIntro, Panel } from "../components/UI";
 import { id } from "../lib/storage";
 import { api } from "../lib/api";
@@ -16,6 +17,7 @@ export default function Clients() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(blank);
   const [newPassword, setNewPassword] = useState("");
+  const dialog = useSystemDialog();
   const filtered = clients.filter((client) =>
     (stage === "Todos" || client.status === stage) &&
     [client.name, client.contact, client.email, client.phone, client.company, client.bookingCode]
@@ -23,12 +25,12 @@ export default function Clients() {
   const booking = bookings.find((item) => item.code === form.bookingCode);
   function open(client) { setEditing(client || {}); setForm(client ? { ...client } : { ...blank }); setNewPassword(""); }
   async function resetPassword() {
-    if (!window.confirm("Gerar uma nova senha? A anterior deixará de funcionar.")) return;
+    if (!await dialog.confirm("Gerar uma nova senha? A anterior deixará de funcionar.")) return;
     try { const result = await api(`/admin/clients/${editing.id}/password`, { method: "POST" }); setNewPassword(result.password); }
-    catch (reason) { window.alert(reason.message); }
+    catch (reason) { dialog.notice(reason.message); }
   }
-  function remove(client) {
-    if (!window.confirm(`Eliminar a ficha de ${client.name}? Os projetos ficam sem cliente associado.`)) return;
+  async function remove(client) {
+    if (!await dialog.confirm(`Eliminar a ficha de ${client.name}? Os projetos ficam sem cliente associado.`)) return;
     setClients(clients.filter((entry) => entry.id !== client.id)); setEditing(null);
   }
   function save(event) {
