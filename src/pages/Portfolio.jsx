@@ -11,6 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useAdmin } from "../App";
+import { useSystemDialog } from "../components/SystemDialog";
 import ImageFields from "../components/ImageFields";
 import {
   Badge,
@@ -45,6 +46,7 @@ const blank = {
 export default function Portfolio() {
   const { category } = useParams();
   const { portfolio, setPortfolio, can } = useAdmin();
+  const dialog = useSystemDialog();
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(blank);
   const [checkText, setCheckText] = useState("");
@@ -59,7 +61,7 @@ export default function Portfolio() {
   }
   function toggleCategoryFeature(item) {
     if (!item.featured && featured >= 3)
-      return window.alert("Podes destacar até 3 trabalhos nesta categoria.");
+      return dialog.notice("Podes destacar até 3 trabalhos nesta categoria.");
     setPortfolio(
       portfolio.map((entry) =>
         entry.id === item.id ? { ...entry, featured: !entry.featured } : entry,
@@ -87,9 +89,9 @@ export default function Portfolio() {
     if (
       portfolio.some((entry) => entry.slug === slug && entry.id !== editing.id)
     )
-      return window.alert("Já existe um trabalho com este identificador.");
+      return dialog.notice("Já existe um trabalho com este identificador.");
     if (item.featured && !editing.featured && featured >= 3)
-      return window.alert(
+      return dialog.notice(
         "Já existem três trabalhos em destaque nesta categoria.",
       );
     setPortfolio(
@@ -100,8 +102,8 @@ export default function Portfolio() {
     setEditing(null);
   }
   const accessArea = `portfolio_${category === "websites" ? "web" : category}`;
-  function remove(item) {
-    if (window.confirm(`Eliminar o trabalho ${item.title}?`)) setPortfolio(portfolio.filter((entry) => entry.id !== item.id));
+  async function remove(item) {
+    if (await dialog.confirm(`Eliminar o trabalho ${item.title}?`)) setPortfolio(portfolio.filter((entry) => entry.id !== item.id));
   }
   return (
     <>
