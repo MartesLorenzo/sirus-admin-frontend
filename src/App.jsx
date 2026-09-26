@@ -18,7 +18,7 @@ export const useAdmin = () => useContext(AdminContext);
 const initial = { bookings: [], availability: [], clients: [], projects: [], portfolio: [], news: [], transactions: [], settings: {} };
 const resources = { clients: "clients", projects: "projects", portfolio: "portfolio", news: "news", transactions: "transactions" };
 function payload(key, item) {
-  const { id, createdAt, updatedAt, trackingCode, accessPasswordHash, meetingId, passwordHash, objectives, client, code, progress, ...fields } = item;
+  const { id, createdAt, updatedAt, trackingCode, accessPasswordHash, meetingId, passwordHash, objectives, client, code, progress, legacyProgress, ...fields } = item;
   if (key === "clients") return {
     name: fields.name, contact: fields.contact || "", phone: fields.phone || "", email: fields.email || "",
     status: fields.status, origin: fields.origin || "", company: fields.company || "", bookingCode: fields.bookingCode || "", notes: fields.notes || "",
