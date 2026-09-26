@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { KeyRound, Plus, ShieldCheck, Trash2, UserRound, History } from "lucide-react";
 import { api } from "../lib/api";
 import { useAdmin } from "../App";
+import { useSystemDialog } from "../components/SystemDialog";
 import { Field, Modal, PageIntro, Panel } from "../components/UI";
 
 const areas = [
@@ -17,6 +18,7 @@ const blankPermissions = () => Object.fromEntries(areas.map(([key]) => [key, { v
 const blank = () => ({ name: "", email: "", role: "EMPLOYEE", jobTitle: "", active: true, permissions: blankPermissions() });
 export default function Team() {
   const { user } = useAdmin();
+  const dialog = useSystemDialog();
   const [users, setUsers] = useState([]);
   const [logs, setLogs] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
@@ -52,11 +54,11 @@ export default function Team() {
     } catch (cause) { setError(cause.status === 404 ? "A API ligada ao painel está desatualizada. Atualiza e reinicia o Sirus-Backend para criar utilizadores." : cause.message); } finally { setBusy(false); }
   }
   async function remove(person) {
-    if (!window.confirm(`Eliminar o acesso de ${person.name || person.email}?`)) return;
+    if (!await dialog.confirm(`Eliminar o acesso de ${person.name || person.email}?`)) return;
     try { await api(`/admin/users/${person.id}`, { method: "DELETE" }); await reload(); } catch (cause) { setError(cause.message); }
   }
   async function reset(person) {
-    if (!window.confirm(`Substituir a senha de ${person.email}?`)) return;
+    if (!await dialog.confirm(`Substituir a senha de ${person.email}?`)) return;
     try { const result = await api(`/admin/users/${person.id}/reset-password`, { method: "POST" }); setEditing({ id: person.id }); setSecret(result.password); await reload(); } catch (cause) { setError(cause.message); }
   }
   async function ownPassword(event) {
