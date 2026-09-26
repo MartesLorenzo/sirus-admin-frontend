@@ -304,7 +304,7 @@ export default function News() {
             </Field>
             <ImageFields
               images={form.images}
-              onChange={(images) => setForm({ ...form, images })}
+              onChange={(images) => setForm((current) => ({ ...current, images }))}
             />
             <div className="form-grid">
               <Field label="Estado editorial">

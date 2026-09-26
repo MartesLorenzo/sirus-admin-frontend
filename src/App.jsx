@@ -9,14 +9,15 @@ import ClientTracking from "./pages/ClientTracking";
 import Projects from "./pages/Projects";
 import Portfolio from "./pages/Portfolio";
 import News from "./pages/News";
+import SocialProof from "./pages/SocialProof";
 import Finance from "./pages/Finance";
 import Settings from "./pages/Settings";
 
 const AdminContext = createContext(null);
 export const useAdmin = () => useContext(AdminContext);
 
-const initial = { bookings: [], availability: [], clients: [], projects: [], portfolio: [], news: [], transactions: [], settings: {} };
-const resources = { clients: "clients", projects: "projects", portfolio: "portfolio", news: "news", transactions: "transactions" };
+const initial = { bookings: [], availability: [], clients: [], projects: [], portfolio: [], news: [], companies: [], testimonials: [], transactions: [], settings: {} };
+const resources = { clients: "clients", projects: "projects", portfolio: "portfolio", news: "news", companies: "companies", testimonials: "testimonials", transactions: "transactions" };
 function payload(key, item) {
   const { id, createdAt, updatedAt, trackingCode, accessPasswordHash, meetingId, passwordHash, objectives, client, code, progress, legacyProgress, ...fields } = item;
   if (key === "clients") return {
@@ -39,6 +40,14 @@ function payload(key, item) {
     title: fields.title, slug: fields.slug, subtitle: fields.subtitle || "", category: fields.category || "Novidades",
     summary: fields.summary || "", sections: fields.sections || [], checklist: fields.checklist || [], images: fields.images || [],
     status: fields.status || "Rascunho", featured: Boolean(fields.featured), date: fields.date,
+  };
+  if (key === "companies") return {
+    name: fields.name, logo: fields.logo, website: fields.website || "",
+    featured: Boolean(fields.featured), published: Boolean(fields.published),
+  };
+  if (key === "testimonials") return {
+    name: fields.name, role: fields.role || "", quote: fields.quote,
+    images: fields.images || [], featured: Boolean(fields.featured), published: Boolean(fields.published),
   };
   return { type: fields.type, title: fields.title, amount: Number(fields.amount), date: fields.date, clientId: fields.clientId || null };
 }
@@ -122,6 +131,7 @@ export default function App() {
             <Route path="projetos/:id/acompanhamento" element={<ClientTracking />} />
             <Route path="portfolio/:category" element={<Portfolio />} />
             <Route path="noticias" element={<News />} />
+            <Route path="testemunhos" element={<SocialProof />} />
             <Route path="gestao" element={<Finance />} />
             <Route path="configuracoes" element={<Settings />} />
             <Route path="*" element={<Navigate to="/" replace />} />

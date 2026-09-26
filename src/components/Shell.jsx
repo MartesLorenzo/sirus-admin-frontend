@@ -15,6 +15,7 @@ import {
   Monitor,
   FolderKanban,
   Newspaper,
+  MessageSquareQuote,
   Settings2,
   Smartphone,
   X,
@@ -37,6 +38,7 @@ const groups = [
       { to: "/portfolio/mobile", label: "Portfólio Mobile", icon: Smartphone },
       { to: "/portfolio/pc", label: "Portfólio PC", icon: Monitor },
       { to: "/noticias", label: "Notícias", icon: Newspaper },
+      { to: "/testemunhos", label: "Testemunhos", icon: MessageSquareQuote },
     ],
   },
   {

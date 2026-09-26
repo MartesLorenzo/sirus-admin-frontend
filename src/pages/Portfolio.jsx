@@ -290,7 +290,7 @@ export default function Portfolio() {
             {category === "mobile" && <div className="form-grid"><Field label="Download Android"><input type="url" value={form.androidUrl || ""} onChange={(event) => setForm({ ...form, androidUrl: event.target.value })} /></Field><Field label="Download iOS"><input type="url" value={form.iosUrl || ""} onChange={(event) => setForm({ ...form, iosUrl: event.target.value })} /></Field></div>}
             <ImageFields
               images={form.images}
-              onChange={(images) => setForm({ ...form, images })}
+              onChange={(images) => setForm((current) => ({ ...current, images }))}
             />
             <label className="check-line">
               <input
