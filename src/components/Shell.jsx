@@ -6,7 +6,6 @@ import {
   Bell,
   CalendarDays,
   ChartNoAxesCombined,
-  ChevronDown,
   CircleHelp,
   ContactRound,
   Globe2,
@@ -75,14 +74,6 @@ export default function Shell() {
           >
             <X size={20} />
           </button>
-        </div>
-        <div className="workspace-chip">
-          <span className="workspace-avatar">S</span>
-          <span>
-            <b>Sirus Cloud</b>
-            <small>Workspace principal</small>
-          </span>
-          <ChevronDown size={15} />
         </div>
         <nav aria-label="Navegação principal">
           {groups.map((group) => (
